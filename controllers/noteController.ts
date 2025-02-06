@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import Note from '../models/Note';
+import { createSuccessResponse, createErrorResponse } from '../types/response';
 
 export const createNote = async (req: AuthRequest, res: Response) => {
   try {
@@ -11,10 +12,10 @@ export const createNote = async (req: AuthRequest, res: Response) => {
       user: req.user!.id,
     });
     await note.save();
-    res.json(note);
+    res.json(createSuccessResponse(note));
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: '服务器错误' });
+    res.status(500).json(createErrorResponse('服务器错误'));
   }
 };
 
@@ -40,7 +41,7 @@ export const getNotes = async (req: AuthRequest, res: Response): Promise<void> =
     // 获取该用户总的笔记数量，用于计算总页数
     const totalNotes = await Note.countDocuments({ user: req.user!.id });
 
-    res.json({
+    res.json(createSuccessResponse({
       notes,
       pagination: {
         page,                      // 当前页码
@@ -48,10 +49,10 @@ export const getNotes = async (req: AuthRequest, res: Response): Promise<void> =
         totalNotes,                // 总记录数
         totalPages: Math.ceil(totalNotes / limit) // 总页数
       }
-    });
+    }));
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: '服务器错误' });
+    res.status(500).json(createErrorResponse('服务器错误'));
   }
 };
 
@@ -59,12 +60,12 @@ export const getNote = async (req: AuthRequest, res: Response) => {
   try {
     const note = await Note.findOne({ _id: req.params.id, user: req.user!.id });
     if (!note) {
-      res.status(404).json({ message: '笔记不存在' });
+      res.status(404).json(createErrorResponse('笔记不存在'));
     }
-    res.json(note);
+    res.json(createSuccessResponse(note));
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: '服务器错误' });
+    res.status(500).json(createErrorResponse('服务器错误'));
   }
 };
 
@@ -73,16 +74,16 @@ export const updateNote = async (req: AuthRequest, res: Response) => {
     const { title, content } = req.body;
     const note = await Note.findOne({ _id: req.params.id, user: req.user!.id });
     if (!note) {
-      res.status(404).json({ message: '笔记不存在' });
+      res.status(404).json(createErrorResponse('笔记不存在'));
     } else {
       note.title = title || note.title;
       note.content = content || note.content;
       await note.save();
-      res.json(note);
+      res.json(createSuccessResponse(note));
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: '服务器错误' });
+    res.status(500).json(createErrorResponse('服务器错误'));
   }
 };
 
@@ -90,11 +91,11 @@ export const deleteNote = async (req: AuthRequest, res: Response) => {
   try {
     const note = await Note.findOneAndDelete({ _id: req.params.id, user: req.user!.id });
     if (!note) {
-      res.status(404).json({ message: '笔记不存在' });
+      res.status(404).json(createErrorResponse('笔记不存在'));
     }
-    res.json({ message: '删除成功' });
+    res.json(createSuccessResponse(null, '删除成功'));
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: '服务器错误' });
+    res.status(500).json(createErrorResponse('服务器错误'));
   }
 };
