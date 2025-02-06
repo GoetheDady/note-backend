@@ -1,0 +1,36 @@
+# 依赖目录
+node_modules/
+
+# 编译输出
+dist/
+build/
+
+# 环境变量文件
+.env
+.env.local
+.env.*
+
+# 日志文件
+logs/
+*.log
+npm-debug.log*
+
+# IDE 和编辑器文件
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# TypeScript 缓存
+*.tsbuildinfo
+
+# 测试覆盖率报告
+coverage/
+
+# 临时文件
+tmp/
+temp/
