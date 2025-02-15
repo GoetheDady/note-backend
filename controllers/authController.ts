@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import UserAuth from '../models/UserAuth';
 import UserProfile from '../models/UserProfile';
 import jwt from 'jsonwebtoken';
-import { ValidationError } from '../utils/errors';
 import { ApiResponse, createSuccessResponse } from '../types/response';
 import { createErrorResponse } from '../types/response';
 
