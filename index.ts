@@ -15,7 +15,7 @@ import userRoutes from './routes/user';
 dotenv.config();
 
 // 验证必要的环境变量
-const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
+const requiredEnvVars = ['DEV_MONGO_URI', 'PROD_MONGO_URI', 'JWT_SECRET'];
 requiredEnvVars.forEach(envVar => {
   if (!process.env[envVar]) {
     throw new Error(`${envVar} 环境变量未设置`);
@@ -86,7 +86,7 @@ const mongooseOptions = {
 
 // 连接 MongoDB 数据库
 mongoose
-  .connect(process.env.MONGO_URI!, mongooseOptions)
+  .connect(process.env.NODE_ENV === 'production' ? process.env.PROD_MONGO_URI! : process.env.DEV_MONGO_URI! , mongooseOptions)
   .then(() => console.log('MongoDB 连接成功'))
   .catch((err) => {
     console.error('MongoDB 连接错误：', err);
