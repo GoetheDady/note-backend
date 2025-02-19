@@ -46,7 +46,6 @@ const validatePassword = (password: string | undefined): void => {
  */
 export const validateRegister = (req: Request, res: Response, next: NextFunction): void => {
   const { username: rawUsername, password } = req.body;
-  debugger
   // 验证并处理用户名
   const username = validateUsername(rawUsername);
   req.body.username = username;

@@ -5,6 +5,14 @@ import jwt from 'jsonwebtoken';
 import { ApiResponse, createSuccessResponse } from '../types/response';
 import { createErrorResponse } from '../types/response';
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
+
 /**
  * 创建JWT令牌
  * @param userId - 用户ID
@@ -32,28 +40,30 @@ export const register = async (
 ): Promise<void> => {
   try {
     const { username, password, fullName, bio, avatar } = req.body;
-    // 检查用户是否已存在
+    
+    if (!username || !password) {
+      res.status(400).json(createErrorResponse('用户名和密码是必需的'));
+      return;
+    }
+
     const existingUser = await UserAuth.findOne({ username });
     if (existingUser) {
       res.status(400).json(createErrorResponse('用户已存在'));
       return;
     }
 
-    // 创建用户资料
     const profile = await new UserProfile({
-      fullName: fullName || username, // 如果未提供全名，使用用户名
+      fullName: fullName || username,
       bio,
       avatar,
     }).save();
 
-    // 创建用户认证信息
     const user = await new UserAuth({
       username,
       password,
       profile: profile._id,
     }).save();
 
-    // 生成JWT令牌
     const token = createToken(user._id as string);
 
     res.json(createSuccessResponse({ token }, '注册成功'));

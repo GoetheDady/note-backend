@@ -1,4 +1,5 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
+import session from 'express-session';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
@@ -44,6 +45,17 @@ app.use(cors({
 // 使用 body-parser 中间件解析 JSON 请求体
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
+// 使用 express-session 中间件
+app.use(session({
+  secret: process.env.SESSION_SECRET || '',
+  resave: true,
+  saveUninitialized: true,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 10 // 10分钟
+  }
+}));
 
 // 健康检查接口
 app.get('/health', (req: Request, res: Response) => {
@@ -92,7 +104,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   
   res.status(500).json({
     success: false,
-    message: '服务器内部错误',
+    message: err.message || '服务器内部错误',
     error: process.env.NODE_ENV === 'development' ? err.message : undefined,
     path: req.path
   });
